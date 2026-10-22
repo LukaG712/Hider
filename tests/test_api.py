@@ -18,7 +18,16 @@ os.environ["DB_PATH"] = db_path
 
 @pytest.fixture(autouse=True)
 def cleanup_db():
-    """Clean up test database after each test."""
+    """Clean up test database before and after each test."""
+    # Remove old database and re-initialize tables before each test
+    for suffix in ("", "-wal", "-shm"):
+        path = db_path + suffix
+        if os.path.exists(path):
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+    api_storage._init_db()
     yield
     # Close any open connections before deleting
     if os.path.exists(db_path):
