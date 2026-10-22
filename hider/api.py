@@ -1,15 +1,14 @@
 """FastAPI application for Hider secret management service."""
 
-import os
 import logging
-from datetime import datetime
-from typing import Any, Optional
+import os
+from typing import Any
 
-from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi import FastAPI, Header, HTTPException
 
-from hider.models import Secret, Config
+from hider.encryption import decrypt_value, encrypt_value
+from hider.models import Config, Secret
 from hider.storage import Storage
-from hider.encryption import encrypt_value, decrypt_value
 
 logger = logging.getLogger("hider")
 
@@ -23,9 +22,9 @@ API_KEY = os.getenv("API_KEY", "Hider-dev-key-change-me")
 storage = Storage(db_path=os.getenv("DB_PATH", "/app/data/hider.db"))
 
 
-def verify_bearer(authorization: Optional[str] = Header(None)) -> None:
+def verify_bearer(authorization: str | None = Header(None)) -> None:
     """Verify Bearer token in Authorization header.
-    
+
     Falls back to query parameter for backward compatibility, but prefers
     the Authorization header for security.
     """
@@ -34,7 +33,7 @@ def verify_bearer(authorization: Optional[str] = Header(None)) -> None:
     else:
         # Reject — no valid Bearer token
         raise HTTPException(status_code=401, detail="Missing or invalid Authorization header. Use: Authorization: Bearer <key>")
-    
+
     import hmac
     if not hmac.compare_digest(token, API_KEY):
         raise HTTPException(status_code=401, detail="Invalid API key")
@@ -50,7 +49,7 @@ async def health() -> dict[str, str]:
 @app.post("/api/secrets")
 async def create_secret(
     data: dict[str, Any],
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, Any]:
     verify_bearer(authorization)
     secret = Secret(
@@ -66,14 +65,13 @@ async def create_secret(
 
 @app.get("/api/secrets")
 async def list_secrets(
-    service: Optional[str] = None,
-    authorization: Optional[str] = Header(None),
+    service: str | None = None,
+    authorization: str | None = Header(None),
 ) -> list[dict[str, Any]]:
     verify_bearer(authorization)
     rows = storage.list_secrets(service=service)
     results = []
     for row in rows:
-        decrypted = decrypt_value(row["value"]) or row["value"]
         result = {
             "id": row["id"],
             "key": row["key"],
@@ -90,7 +88,7 @@ async def list_secrets(
 @app.get("/api/secrets/{key}")
 async def get_secret(
     key: str,
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, Any]:
     verify_bearer(authorization)
     row = storage.get_secret(key)
@@ -114,7 +112,7 @@ async def get_secret(
 async def update_secret(
     key: str,
     data: dict[str, Any],
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, Any]:
     verify_bearer(authorization)
     row = storage.get_secret(key)
@@ -144,7 +142,7 @@ async def update_secret(
 @app.delete("/api/secrets/{key}")
 async def delete_secret(
     key: str,
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, bool]:
     verify_bearer(authorization)
     deleted = storage.delete_secret(key)
@@ -158,7 +156,7 @@ async def delete_secret(
 @app.post("/api/configs")
 async def create_config(
     data: dict[str, Any],
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, Any]:
     verify_bearer(authorization)
     config = Config(
@@ -173,8 +171,8 @@ async def create_config(
 
 @app.get("/api/configs")
 async def list_configs(
-    service: Optional[str] = None,
-    authorization: Optional[str] = Header(None),
+    service: str | None = None,
+    authorization: str | None = Header(None),
 ) -> list[dict[str, Any]]:
     verify_bearer(authorization)
     rows = storage.list_configs(service=service)
@@ -196,7 +194,7 @@ async def list_configs(
 @app.get("/api/configs/{key}")
 async def get_config(
     key: str,
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, Any]:
     verify_bearer(authorization)
     row = storage.get_config(key)
@@ -218,7 +216,7 @@ async def get_config(
 async def update_config(
     key: str,
     data: dict[str, Any],
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, Any]:
     verify_bearer(authorization)
     row = storage.get_config(key)
@@ -247,7 +245,7 @@ async def update_config(
 @app.delete("/api/configs/{key}")
 async def delete_config(
     key: str,
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
 ) -> dict[str, bool]:
     verify_bearer(authorization)
     deleted = storage.delete_config(key)

@@ -1,7 +1,7 @@
 """Data models for Hider secret management."""
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 
@@ -10,10 +10,10 @@ class Secret:
         self,
         key: str,
         value: str,
-        service: Optional[str] = None,
-        description: Optional[str] = None,
-        id: Optional[UUID] = None,
-        created_at: Optional[datetime] = None,
+        service: str | None = None,
+        description: str | None = None,
+        id: UUID | None = None,
+        created_at: datetime | None = None,
     ):
         self.id = id or uuid4()
         self.key = key
@@ -44,10 +44,10 @@ class Config:
         self,
         key: str,
         value: Any,
-        service: Optional[str] = None,
-        description: Optional[str] = None,
-        id: Optional[UUID] = None,
-        created_at: Optional[datetime] = None,
+        service: str | None = None,
+        description: str | None = None,
+        id: UUID | None = None,
+        created_at: datetime | None = None,
     ):
         self.id = id or uuid4()
         self.key = key

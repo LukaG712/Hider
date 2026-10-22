@@ -3,10 +3,9 @@
 import os
 import sqlite3
 from datetime import datetime
-from typing import Any, Optional
-from uuid import UUID, uuid4
+from typing import Any
 
-from hider.models import Secret, Config
+from hider.models import Config, Secret
 
 
 class Storage:
@@ -68,7 +67,7 @@ class Storage:
             conn.commit()
         return secret
 
-    def get_secret(self, key: str) -> Optional[dict]:
+    def get_secret(self, key: str) -> dict | None:
         with self._get_conn() as conn:
             row = conn.execute(
                 "SELECT * FROM secrets WHERE key = ?", (key,)
@@ -77,7 +76,7 @@ class Storage:
                 return None
             return dict(row)
 
-    def list_secrets(self, service: Optional[str] = None) -> list[dict]:
+    def list_secrets(self, service: str | None = None) -> list[dict]:
         with self._get_conn() as conn:
             if service:
                 rows = conn.execute(
@@ -90,7 +89,7 @@ class Storage:
                 ).fetchall()
             return [dict(r) for r in rows]
 
-    def update_secret(self, key: str, **fields: Any) -> Optional[dict]:
+    def update_secret(self, key: str, **fields: Any) -> dict | None:
         with self._get_conn() as conn:
             existing = conn.execute("SELECT * FROM secrets WHERE key = ?", (key,)).fetchone()
             if existing is None:
@@ -134,7 +133,7 @@ class Storage:
             conn.commit()
         return config
 
-    def get_config(self, key: str) -> Optional[dict]:
+    def get_config(self, key: str) -> dict | None:
         with self._get_conn() as conn:
             row = conn.execute(
                 "SELECT * FROM configs WHERE key = ?", (key,)
@@ -143,7 +142,7 @@ class Storage:
                 return None
             return dict(row)
 
-    def list_configs(self, service: Optional[str] = None) -> list[dict]:
+    def list_configs(self, service: str | None = None) -> list[dict]:
         with self._get_conn() as conn:
             if service:
                 rows = conn.execute(
@@ -156,7 +155,7 @@ class Storage:
                 ).fetchall()
             return [dict(r) for r in rows]
 
-    def update_config(self, key: str, **fields: Any) -> Optional[dict]:
+    def update_config(self, key: str, **fields: Any) -> dict | None:
         with self._get_conn() as conn:
             existing = conn.execute("SELECT * FROM configs WHERE key = ?", (key,)).fetchone()
             if existing is None:

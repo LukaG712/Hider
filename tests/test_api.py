@@ -1,9 +1,8 @@
 """Tests for Hider secret management service."""
 
 import os
-import sys
 import tempfile
-import importlib
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -38,8 +37,8 @@ def cleanup_db():
 
 
 # Now import after env vars are set
-from hider.api import app, storage as api_storage
-from hider.storage import Storage
+from hider.api import app  # noqa: E402
+from hider.api import storage as api_storage  # noqa: E402
 
 # Reconfigure storage to use the temp database
 api_storage.db_path = db_path

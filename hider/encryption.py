@@ -5,17 +5,16 @@ at rest. The encryption key is derived from the ENCRYPTION_KEY environment
 variable using a simple key derivation.
 """
 
-import os
 import base64
 import hashlib
-from typing import Optional
+import os
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 def get_encryption_key() -> bytes:
     """Get the 32-byte encryption key from environment.
-    
+
     Derives a 32-byte key from the ENCRYPTION_KEY environment variable
     using SHA-256 to ensure proper key length.
     """
@@ -28,7 +27,7 @@ def get_encryption_key() -> bytes:
 
 def encrypt_value(plaintext: str) -> str:
     """Encrypt a plaintext value using AES-256-GCM.
-    
+
     Returns a base64-encoded string containing the nonce and ciphertext.
     Format: base64(nonce || ciphertext)
     """
@@ -41,9 +40,9 @@ def encrypt_value(plaintext: str) -> str:
     return base64.b64encode(encrypted).decode("ascii")
 
 
-def decrypt_value(encrypted_b64: str) -> Optional[str]:
+def decrypt_value(encrypted_b64: str) -> str | None:
     """Decrypt an AES-256-GCM encrypted value.
-    
+
     Returns the plaintext string or None if decryption fails.
     """
     try:
