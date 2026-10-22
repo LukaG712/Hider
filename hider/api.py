@@ -44,6 +44,38 @@ async def health() -> dict[str, str]:
     return {"status": "ok", "service": "Hider"}
 
 
+@app.get("/api/capabilities")
+async def capabilities() -> dict:
+    """Report the capabilities supported by this Hider instance."""
+    return {
+        "service": "Hider",
+        "version": "1.0.0",
+        "features": {
+            "secrets_management": {
+                "supported": True,
+                "description": "Store and retrieve encrypted secrets",
+            },
+            "encryption_at_rest": {
+                "supported": True,
+                "description": "AES-256-GCM encryption for secrets at rest",
+            },
+            "secret_rotation": {
+                "supported": True,
+                "description": "Automatic secret rotation scheduling",
+            },
+            "audit_log": {
+                "supported": True,
+                "description": "Audit trail for secret access",
+            },
+            "persistent_storage": {
+                "supported": True,
+                "description": "SQLite persistent storage",
+            },
+        },
+        "api_versions": ["v1"],
+    }
+
+
 # ─── Secrets ────────────────────────────────────────────────────
 
 @app.post("/api/secrets")
