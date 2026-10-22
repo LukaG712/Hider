@@ -22,7 +22,7 @@ Homepage = "https://github.com/LukaG712/Hider"
 Repository = "https://github.com/LukaG712/Hider"
 
 [project.optional-dependencies]
-dev = ["pytest==8.3.0", "pytest-asyncio==0.24.0", "pytest-timeout==2.3.1", "ruff==0.9.0"]
+dev = ["pytest==8.3.0", "pytest-asyncio==0.24.0", "pytest-timeout==2.3.1", "ruff==0.9.0", "httpx"]
 
 [tool.setuptools.packages.find]
 include = ["hider*"]
