@@ -1,8 +1,5 @@
 # Hider
 
-> *"Everything was swell, until someone split the Dark Moon..."*
-> ~ **The Dark Moon Song**, on how it all began
-
 **Hider** is the secret and configuration management service for the Evershade ecosystem. It provides encrypted storage for API keys, passwords, and sensitive configuration data.
 
 **Luigi's Mansion origin:** *Hider* ~ ghosts from Luigi's Mansion: Dark Moon that hide in plain sight, making them hard to find.
